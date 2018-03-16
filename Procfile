@@ -1,1 +1,1 @@
-web: gunicorn bin.run:app --workers 3
+web: sh -c 'ADD . && gunicorn bin.run:app --workers 3'
