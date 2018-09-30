@@ -54,6 +54,15 @@ docker run -it \
    python_demo
 ```
 
+### Alternatively deploy minikube and Helm and use a "helm chart" to deploy
+[minikube](https://github.com/kubernetes/minikube)    
+[helm](https://github.com/helm/helm/blob/master/docs/install.md)
+
+```bash
+cd python_demo/kubernetes/helm/python_demo_chart
+helm install --namespace=pythondemo --name python-demo-1.0.0 .
+```
+
 
 ### Expose to Internet
 
