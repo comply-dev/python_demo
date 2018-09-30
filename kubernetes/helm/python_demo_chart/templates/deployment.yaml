@@ -1,0 +1,28 @@
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ .Values.pythondemo.fullname }}
+  labels:
+    app: {{ .Values.pythondemo.fullname }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.pythondemo.fullname }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.pythondemo.fullname }}
+    spec:
+      containers:
+      - name: {{ .Values.pythondemo.fullname }}
+        image: "{{ .Values.image.pythondemo.repository }}:{{ .Values.image.pythondemo.tag }}"
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 3000
+          protocol: TCP
+        - containerPort: 3001
+          protocol: TCP
+---

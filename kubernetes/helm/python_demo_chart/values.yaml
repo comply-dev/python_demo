@@ -1,0 +1,38 @@
+# Default values for python_demo.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+application:
+  environment: "dev"
+
+replicaCount: 1
+
+pythondemo:
+  fullname: "pythondemo"
+  name: "pythondemo"
+
+image:
+  pullPolicy: IfNotPresent
+  pythondemo:
+    repository: "quay.io/verygoodsecurity/python_demo"
+    tag: latest
+    fullname: pythondemo
+
+service:
+  ssl_cert_arn: ""
+  hostname: pythondemo.domain.io
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+tolerations: []

@@ -1,0 +1,7 @@
+name: pythondemo
+version: 1.0.0
+appVersion: 1.0.0
+description: VGS Python Demo
+sources:
+- git@github.com:verygoodsecurity/python_demo.git
+engine: gotpl

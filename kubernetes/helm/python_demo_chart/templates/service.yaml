@@ -1,0 +1,27 @@
+---
+# Internal (to the cluster) pythondemo http listener
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: pythondemo
+  name: pythondemo
+  namespace: pythondemo
+spec:
+  ports:
+  - name: pythondemo
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: pythondemo-3000
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  - name: pythondemo-3001
+    port: 3001
+    protocol: TCP
+    targetPort: 3001
+  selector:
+    app: pythondemo
+  sessionAffinity: None
+---
