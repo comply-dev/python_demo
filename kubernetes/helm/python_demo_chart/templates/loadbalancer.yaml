@@ -9,9 +9,9 @@ metadata:
   namespace: pythondemo
   annotations:
     # TODO move these to the values.yaml
-    dns.alpha.kubernetes.io/external: pythondemo.example.com
-    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
-    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: '80'
+    dns.alpha.kubernetes.io/external: {{ .Values.service.dns }}
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: {{ .Values.service.proto }}
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: {{ .Values.service.port }}
 spec:
   externalTrafficPolicy: Cluster
   ports:

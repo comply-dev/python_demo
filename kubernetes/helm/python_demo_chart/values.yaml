@@ -11,6 +11,11 @@ pythondemo:
   fullname: "pythondemo"
   name: "pythondemo"
 
+service:
+  dns: "pythondemo.example.com"
+  port: 80
+  proto: "tcp"
+
 image:
   pullPolicy: IfNotPresent
   pythondemo:
