@@ -15,7 +15,7 @@ setup(
     install_requires=[
         "gunicorn==19.7.1",
         "requests==2.18.4",
-        "Flask==0.12.2",
+        "Flask==0.12.3",
         "Flask-Admin==1.5.1",
         "Flask-SQLAlchemy==2.3.2",
    ],
