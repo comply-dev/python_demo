@@ -1,1 +1,1 @@
-web: gunicorn --pythonpath demo demo.app:app --workers 3
+web: python demo/app.py
