@@ -106,6 +106,7 @@ class Payment(db.Model):
 
 def _charge(payload, url=None):
     if not url:
+        print(current_app.config)
         root_url = current_app.config['VGS_PROCESSOR_ROOT_URL']
         url = urljoin(root_url, '/charge')
 
