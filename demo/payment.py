@@ -1,6 +1,7 @@
 import json
 import sys
 import traceback
+import re
 from datetime import datetime
 from urllib.parse import urljoin, urlunsplit
 
@@ -72,6 +73,17 @@ class ProxySetting(db.Model):
                  ),
                  '', None, None))
         return proxies
+
+
+def strip_scheme(target, value, oldvalue, initiator):
+    """Strip scheme from url"""
+
+    pattern = r'^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?'
+    return re.sub(pattern, '', value)
+
+# setup listener on ProxySetting.proxy_url attribute, instructing
+# it to use the return value
+db.event.listen(ProxySetting.proxy_url, 'set', strip_scheme, retval=True)
 
 
 class Payment(db.Model):
