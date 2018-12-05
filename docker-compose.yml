@@ -1,0 +1,19 @@
+version: '3.3'
+
+services:
+  app:
+    build: ./
+    container_name: pydemo
+    command: bash
+    volumes:
+      - ./:/opt/app/src
+    env_file:
+      - .env
+    environment:
+      PYTHONUNBUFFERED: 0
+    ports:
+      - "3141:3141"
+      - "3142:3142"
+      - "8080:8080"
+    stdin_open: true
+    tty: true
