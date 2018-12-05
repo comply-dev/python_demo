@@ -2,12 +2,15 @@ import json
 import sys
 import traceback
 from datetime import datetime
+from urllib.parse import urljoin, urlunsplit
 
-from flask import render_template, request, Blueprint, flash
+import requests
+from flask import render_template, request, Blueprint, flash, current_app
 from flask_admin import Admin, expose
 from flask_admin.actions import action
 from flask_admin.contrib.sqla import ModelView
 
+import helpers as h
 import processor
 import persistence
 
@@ -18,7 +21,7 @@ bp = Blueprint('payment', __name__)
 
 @bp.route('/', methods=["GET"])
 def index():
-    url = request.args.get('url', 'becomeverygood.com')
+    url = request.args.get('url', 'verygoodsecurity.com')
     return render_template('payment.html', url=url)
 
 
@@ -32,6 +35,43 @@ def create():
     json_data = json.dumps(dic)
     print(json_data)
     return render_template('show_redacted.html', data=dic, url=dic['url'])
+
+
+class ProxySetting(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    proxy_username = db.Column(db.String(100))
+    proxy_password = db.Column(db.String(100))
+    proxy_url = db.Column(db.String(255))
+    proxy_port = db.Column(db.String(5))
+    active = db.Column(db.Boolean, default=False)
+
+    @staticmethod
+    def proxy_env_variables_present(config):
+        return 'VGS_PROXY_URL' in config
+
+    @classmethod
+    def from_config(cls, config):
+        proxy_setting = cls()
+        proxy_setting.proxy_username = config['VGS_PROXY_USERNAME']
+        proxy_setting.proxy_password = config['VGS_PROXY_PASSWORD']
+        proxy_setting.proxy_url = config['VGS_PROXY_URL']
+        proxy_setting.proxy_port = config['VGS_PROXY_PORT']
+        proxy_setting.active = False
+        return proxy_setting
+
+    def as_dict(self):
+        proxies = {}
+        for scheme in ['https', 'http']:
+            proxies[scheme] = urlunsplit(
+                (scheme,
+                 '{PROXY_USERNAME}:{PROXY_PASSWORD}@{PROXY_URL}:{PROXY_PORT}'.format(
+                     PROXY_USERNAME=self.proxy_username,
+                     PROXY_PASSWORD=self.proxy_password,
+                     PROXY_URL=self.proxy_url,
+                     PROXY_PORT=self.proxy_port,
+                 ),
+                 '', None, None))
+        return proxies
 
 
 class Payment(db.Model):
@@ -54,7 +94,7 @@ class Payment(db.Model):
         return payment_obj
 
     def charge(self):
-        response = processor.charge({
+        response = _charge({
             'card': self.card_number,
             'card_expiration': self.card_expiration,
             'card_security_code': self.card_security_code,
@@ -62,6 +102,29 @@ class Payment(db.Model):
         response.raise_for_status()
         print(response.json())
         return True
+
+
+def _charge(payload, url=None):
+    if not url:
+        root_url = current_app.config['VGS_PROCESSOR_ROOT_URL']
+        url = urljoin(root_url, '/charge')
+
+    proxy_setting = ProxySetting.query.filter(ProxySetting.active == True).first()
+    if not proxy_setting and ProxySetting.proxy_env_variables_present(current_app.config):
+        proxy_setting = ProxySetting.from_config(current_app.config)
+
+    proxies = proxy_setting.as_dict()
+
+    r = requests.post(
+        url,
+        data=h.dumps(payload),
+        headers={"Content-type": "application/json"},
+        proxies=proxies,
+        # you can find the equivalent cert in your dashboard
+        #  under the "integration-docs" section
+        verify='demo/static/vgs-sandbox.pem'
+    )
+    return r
 
 
 class CustomView(ModelView):
@@ -97,4 +160,6 @@ def init_app(app):
                            template_mode='bootstrap2')
     merchant_admin.add_view(PaymentAdmin(
         Payment, db.session, endpoint='payments'))
+    merchant_admin.add_view(CustomView(
+        ProxySetting, db.session, endpoint='proxy_settings'))
     return app
