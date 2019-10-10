@@ -126,7 +126,7 @@ def _charge(payload, url=None):
     if not proxy_setting and ProxySetting.proxy_env_variables_present(current_app.config):
         proxy_setting = ProxySetting.from_config(current_app.config)
 
-    proxies = proxy_setting.as_dict()
+    proxies = proxy_setting.as_dict() if proxy_setting else None
 
     r = requests.post(
         url,
