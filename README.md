@@ -127,3 +127,6 @@ Some quick tips on how to set up VGS connections for use with this application.
 ## Used Technologies/Tools:
 
 HTML, CSS, JS, scss, Gulp, NPM, Git, Python
+
+
+LOOK MA I AM AUTOMATED
